@@ -1,0 +1,74 @@
+
+name: Diagnostic Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ci/setup]
+
+jobs:
+  diagnostics:
+    name: Verify mandatory variables
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV : ${{ vars.APP_ENV }}
+      API_KEY : ${{ secrets.API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate APP_ENV & API_KEY
+        id: validate_vars
+        continue-on-error: true
+        run: |
+          MISSING=0
+
+          if [[ -z "${APP_ENV:-}" ]]; then
+            echo "::error::Mandatory repository variable APP_ENV is not set."
+            MISSING=1
+          else
+            echo "::notice::APP_ENV detected: $APP_ENV"
+          fi
+
+          if [[ -z "${API_KEY:-}" ]]; then
+            echo "::error::Mandatory secret API_KEY is not set."
+            MISSING=1
+          else
+            echo "::notice::API_KEY secret is present (masked)."
+          fi
+
+          echo "missing=$MISSING" >> "$GITHUB_OUTPUT"
+
+          if [[ "$MISSING" -ne 0 ]]; then
+            exit 1
+          fi
+
+      - name: Diagnostic summary
+        if: always()
+        env:
+          MISSING: ${{ steps.validate_vars.outputs.missing }}
+        run: |
+          if [[ "$MISSING" == "0" ]]; then
+            STATUS="* All mandatory variables are present."
+            FIX="No additional action is required."
+          else
+            STATUS="* Missing mandatory variables."
+            FIX=$'- Define `APP_ENV` in *Settings → Variables* (Repository variables)\n- Create the secret `API_KEY` in *Settings → Secrets and variables → Actions*'
+          fi
+
+          cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          ## Diagnostic Report
+
+          * **Branch**  : \`$GITHUB_REF_NAME\`
+          * **Runner**  : \`$RUNNER_OS\`
+
+          $STATUS
+
+          ### How to fix
+          $FIX
+          EOF
+
+      - name: Fail pipeline when requirements are missing
+        if: steps.validate_vars.outputs.missing != '0'
+        run: exit 1
