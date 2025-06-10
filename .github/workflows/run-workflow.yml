@@ -1,0 +1,35 @@
+name: Run monitor checks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  env_job:
+    name: Show APP_ENV via env
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: ${{ vars.APP_ENV }}
+    steps:
+      - run: |
+          echo "Contexto env → \$APP_ENV = \"$APP_ENV\""
+
+  vars_job:
+    name: Show SUPPORT_EMAIL via vars context
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Email de suporte: ${{ vars.SUPPORT_EMAIL }}"
+
+  secret_job:
+    name: Use API_KEY secret
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mask secret length (exemplo seguro)
+        run: |
+          echo "API_KEY tem $(echo -n '${{ secrets.API_KEY }}' | wc -c) caracteres (valor mascarado nos logs)"
