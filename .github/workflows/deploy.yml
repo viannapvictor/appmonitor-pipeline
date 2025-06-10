@@ -9,9 +9,11 @@ jobs:
     name: Deploy job (needs approval)
     runs-on: ubuntu-latest
     environment: production
+    env:
+      PROD_DOMAIN: ${{ vars.PROD_DOMAIN }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Simular deploy
+      - name: 🚀 Simular deploy
         run: echo "Deploying to $PROD_DOMAIN"
