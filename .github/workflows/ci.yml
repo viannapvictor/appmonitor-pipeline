@@ -75,10 +75,11 @@ jobs:
           ART_URL:       ${{ steps.upload.outputs.artifact-url }}
         run: |
           cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          ## :clipboard: Job summary
 
-* **Runner OS** : \`$RUNNER_OS\`
-* **Branch**    : \`$GITHUB_REF_NAME\`
-* **Validate**  : $VALIDATE_RES
-* **Test**      : $TEST_RES
-* **Artefato**  : [report.zip]($ART_URL)
-EOF
+          * **Runner OS** : \`$RUNNER_OS\`
+          * **Branch**    : \`$GITHUB_REF_NAME\`
+          * **Validate**  : $VALIDATE_RES
+          * **Test**      : $TEST_RES
+          * **Artefato**  : [report.zip]($ART_URL)
+          EOF
