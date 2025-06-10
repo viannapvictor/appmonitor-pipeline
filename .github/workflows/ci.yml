@@ -7,6 +7,13 @@ on:
   pull_request:
     branches: [ci/setup]
 
+env:
+  ACTIONS_STEP_DEBUG: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   validate:
     name: Validate shell script
@@ -19,6 +26,9 @@ jobs:
       - name: Bash syntax check
         run: bash -n status-check.sh
 
+      - name: Aviso de boas-práticas
+        run: echo "::warning::Lembre-se de versionar scripts Shell somente após testes locais."
+
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -29,14 +39,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Execute tests
+        id: test_step
         run: |
           echo "Running tests"
-          exit 0           # substituir por testes reais no futuro
+          exit 0
+
+      - name: Falha nos testes
+        if: failure()
+        run: echo "::error::Alguns testes falharam. Verifique o relatório acima."
 
   package:
     name: Package report
     runs-on: ubuntu-latest
-    needs: test
+    needs: [validate, test]
 
     steps:
       - name: Checkout code
@@ -47,7 +62,20 @@ jobs:
           zip -r report.zip . -x ".git/*"
 
       - name: Upload artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: report
           path: report.zip
+
+      - name: Publish job summary
+        run: |
+          {
+            echo "## :clipboard: Job summary"
+            echo ""
+            echo "* **Runner OS** : \`$RUNNER_OS\`"
+            echo "* **Branch**    : \`$GITHUB_REF_NAME\`"
+            echo "* **Validate**  : ${{ needs.validate.result }}"
+            echo "* **Test**      : ${{ needs.test.result }}"
+            echo "* **Artefato**  : [report.zip](${{ steps.upload.outputs.artifact-url }})"
+          } >> "$GITHUB_STEP_SUMMARY"
