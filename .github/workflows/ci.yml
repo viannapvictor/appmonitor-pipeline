@@ -69,13 +69,16 @@ jobs:
           path: report.zip
 
       - name: Publish job summary
+        env:
+          VALIDATE_RES: ${{ needs.validate.result }}
+          TEST_RES:      ${{ needs.test.result }}
+          ART_URL:       ${{ steps.upload.outputs.artifact-url }}
         run: |
-          {
-            echo "## :clipboard: Job summary"
-            echo ""
-            echo "* **Runner OS** : \`$RUNNER_OS\`"
-            echo "* **Branch**    : \`$GITHUB_REF_NAME\`"
-            echo "* **Validate**  : ${{ needs.validate.result }}"
-            echo "* **Test**      : ${{ needs.test.result }}"
-            echo "* **Artefato**  : [report.zip](${{ steps.upload.outputs.artifact-url }})"
-          } >> "$GITHUB_STEP_SUMMARY"
+          cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+
+* **Runner OS** : \`$RUNNER_OS\`
+* **Branch**    : \`$GITHUB_REF_NAME\`
+* **Validate**  : $VALIDATE_RES
+* **Test**      : $TEST_RES
+* **Artefato**  : [report.zip]($ART_URL)
+EOF
