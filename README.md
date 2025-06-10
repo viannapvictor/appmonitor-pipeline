@@ -1,4 +1,4 @@
-[![CI](https://img.shields.io/github/actions/workflow/status/<OWNER>/appmonitor-pipeline/ci.yml?branch=ci/setup)](https://github.com/<OWNER>/appmonitor-pipeline/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/viannapvictor/appmonitor-pipeline/ci.yml?branch=ci/setup)](https://github.com/viannapvictor/appmonitor-pipeline/actions/workflows/ci.yml)
 
 
 # AppMonitor – Pipelines & Automatizações
