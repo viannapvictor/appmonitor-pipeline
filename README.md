@@ -1,3 +1,6 @@
+[![CI](https://img.shields.io/github/actions/workflow/status/<OWNER>/appmonitor-pipeline/ci.yml?branch=ci/setup)](https://github.com/<OWNER>/appmonitor-pipeline/actions/workflows/ci.yml)
+
+
 # AppMonitor – Pipelines & Automatizações
 Este repositório é apenas para fins acadêmicos no aprendizado de scripts e workflows de CI/CD.
 
