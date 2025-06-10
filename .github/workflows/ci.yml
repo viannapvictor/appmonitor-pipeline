@@ -1,0 +1,53 @@
+# .github/workflows/ci.yml
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ci/setup]
+  pull_request:
+    branches: [ci/setup]
+
+jobs:
+  validate:
+    name: Validate shell script
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bash syntax check
+        run: bash -n status-check.sh
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Execute tests
+        run: |
+          echo "Running tests"
+          exit 0           # substituir por testes reais no futuro
+
+  package:
+    name: Package report
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create report.zip
+        run: |
+          zip -r report.zip . -x ".git/*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: report.zip
